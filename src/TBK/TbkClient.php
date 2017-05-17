@@ -35,21 +35,46 @@ class TbkClient {
 
     protected $sdkVersion = "open-sdk-php-20151012";
 
-    protected function generateSign($params) {
-        ksort($params);
+    public function __construct($appkey = null, $appsecret = null) {
+        $this->appkey = $appkey;
+        $this->appsecret = $appsecret;
+    }
 
-        $stringToBeSigned = $this->secretKey;
-        foreach ($params as $k => $v)
-        {
-            if("@" != substr($v, 0, 1))
-            {
-                $stringToBeSigned .= "$k$v";
-            }
+    public function execute($request) {
+        $result = [
+            'code' => 0,
+            'msg' => '',
+            'data' => [],
+        ];
+        //组装系统参数
+        $sysParams["app_key"] = $this->appkey;
+        $sysParams["v"] = $this->apiVersion;
+        $sysParams["format"] = $this->format;
+        $sysParams["sign_method"] = $this->signMethod;
+        $sysParams["method"] = $request->getApiMethodName();
+        $sysParams["timestamp"] = gmdate("Y-m-d H:i:s", time() + 28800);
+        $sysParams["partner_id"] = $this->sdkVersion;
+
+        //获取业务参数
+        $apiParams = $request->getApiParas();
+
+        //签名
+        $sysParams["sign"] = $this->sign(array_merge($apiParams, $sysParams));
+
+        //系统参数放入GET请求串
+        $requestUrl = $this->gatewayUrl . "?" . http_build_query($sysParams);
+
+        //发起HTTP请求
+        try {
+            $response = $this->curl($requestUrl, $apiParams);
+        } catch (Exception $e) {
+            $result['code'] = $e->getCode();
+            $result['msg'] = $e->getMessage();
+            return $result;
         }
-        unset($k, $v);
-        $stringToBeSigned .= $this->secretKey;
 
-        return strtoupper(md5($stringToBeSigned));
+        $data = $this->toFormat($response);
+        return $data;
     }
 
     public function curl($url, $postFields = null) {
@@ -69,49 +94,64 @@ class TbkClient {
             curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         }
 
-        if (is_array($postFields) && 0 < count($postFields))
-        {
+        if (is_array($postFields) && 0 < count($postFields)) {
             $postBodyString = "";
             $postMultipart = false;
-            foreach ($postFields as $k => $v)
-            {
-                if("@" != substr($v, 0, 1))//判断是不是文件上传
-                {
+            foreach ($postFields as $k => $v) {
+                if("@" != substr($v, 0, 1)) {
                     $postBodyString .= "$k=" . urlencode($v) . "&";
-                }
-                else//文件上传用multipart/form-data，否则用www-form-urlencoded
-                {
+                } else {
                     $postMultipart = true;
                 }
             }
             unset($k, $v);
             curl_setopt($ch, CURLOPT_POST, true);
-            if ($postMultipart)
-            {
+            if ($postMultipart) {
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
-            }
-            else
-            {
-                $header = array("content-type: application/x-www-form-urlencoded; charset=UTF-8");
-                curl_setopt($ch,CURLOPT_HTTPHEADER,$header);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, substr($postBodyString,0,-1));
+            } else {
+                curl_setopt($ch, CURLOPT_POSTFIELDS, substr($postBodyString, 0, -1));
             }
         }
         $reponse = curl_exec($ch);
 
-        if (curl_errno($ch))
-        {
-            throw new Exception(curl_error($ch),0);
-        }
-        else
-        {
+        if (curl_errno($ch)) {
+            throw new Exception(curl_error($ch), 0);
+        } else {
             $httpStatusCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            if (200 !== $httpStatusCode)
-            {
-                throw new Exception($reponse,$httpStatusCode);
+            if (200 !== $httpStatusCode) {
+                throw new Exception($reponse, $httpStatusCode);
             }
         }
         curl_close($ch);
         return $reponse;
+    }
+
+    protected function sign($params) {
+        ksort($params);
+
+        $stringToBeSigned = $this->appsecret;
+        foreach ($params as $k => $v) {
+            if("@" != substr($v, 0, 1)) {
+                $stringToBeSigned .= "$k$v";
+            }
+        }
+        $stringToBeSigned .= $this->appsecret;
+
+        return strtoupper(md5($stringToBeSigned));
+    }
+
+    protected function toFormat($data) {
+        switch ($this->format) {
+            case 'json':
+                $data = json_decode($data);
+                break;
+            case 'xml':
+                $data_tmp = @simplexml_load_string($data);
+                $data = $data_tmp !== false ? $data_tmp : $data;
+                break;
+            default:
+                break;
+        }
+        return $data;
     }
 }
