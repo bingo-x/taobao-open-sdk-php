@@ -44,7 +44,6 @@ class TbkClient {
         $result = [
             'code' => 0,
             'msg' => '',
-            'data' => [],
         ];
         //组装系统参数
         $sysParams["app_key"] = $this->appkey;
@@ -73,8 +72,8 @@ class TbkClient {
             return $result;
         }
 
-        $data = $this->toFormat($response);
-        return $data;
+        $result['data'] = $this->toFormat($response);
+        return $result;
     }
 
     public function curl($url, $postFields = null) {
