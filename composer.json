@@ -1,0 +1,17 @@
+{
+    "name": "bingo-x/taobao-open-sdk-php",
+    "description": "Taobao Open SDK for PHP",
+    "type": "library",
+    "license": "Apache",
+    "authors": [
+        {
+            "name": "bingo-x",
+        }
+    ],
+    "require": {
+        "php":">=5.4"
+    },
+    "autoload": {
+        "psr-4": {"TBK\\": "src/TBK"}
+    }
+}
