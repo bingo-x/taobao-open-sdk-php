@@ -1,5 +1,6 @@
 {
     "name": "bingo-x/taobao-open-sdk-php",
+    "version": "1.0.0",
     "description": "Taobao Open SDK for PHP",
     "type": "library",
     "license": "Apache",
