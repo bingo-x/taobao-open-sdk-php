@@ -1,6 +1,6 @@
-<?php namespace TBK\request;
+<?php namespace TAE\request;
 
-use TBK\request\PRequest;
+use TAE\request\PRequest;
 
 /**
  * TOP API: taobao.item.get request

@@ -1,11 +1,11 @@
-<?php namespace TBK;
+<?php namespace TAE;
 
 /**
- * Class TbkClient
+ * Class TaeClient
  * 封装对淘宝开放平台的各种API操作
- * @package TBK
+ * @package TAE
  */
-class TbkClient {
+class TaeClient {
 
     protected $appkey;
 

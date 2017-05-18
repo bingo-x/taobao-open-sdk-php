@@ -1,4 +1,4 @@
-<?php namespace TBK\request;
+<?php namespace TAE\request;
 
 interface IRequest {
     public function setFields($fields);

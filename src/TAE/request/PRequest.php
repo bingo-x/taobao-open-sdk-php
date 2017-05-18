@@ -1,6 +1,6 @@
-<?php namespace TBK\request;
+<?php namespace TAE\request;
 
-use TBK\request\IRequest;
+use TAE\request\IRequest;
 
 class PRequest implements IRequest {
     protected $apiMethodName;
