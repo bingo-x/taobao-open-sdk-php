@@ -3,7 +3,7 @@
 use TBK\request\PRequest;
 
 /**
- * TOP API: taobao.tbk.shop.convert request
+ * TOP API: taobao.tbk.item.convert
  *
  * @author auto create
  * @since 1.0, 2015.07.02
@@ -15,6 +15,11 @@ class TbkShopConvertRequest extends PRequest {
     private $adzoneId;
 
     /**
+     * 商品ID串，用','分割，从taobao.tbk.item.get接口获取num_iid字段，最大40个
+     **/
+    private $numIids;
+
+    /**
      * 链接形式：1：PC，2：无线，默认：１
      **/
     private $platform;
@@ -24,12 +29,7 @@ class TbkShopConvertRequest extends PRequest {
      **/
     private $unid;
 
-    /**
-     * 卖家ID串，用','分割，从taobao.tbk.shop.get接口获取user_id字段
-     **/
-    private $userIds;
-
-    protected $apiMethodName = "taobao.tbk.shop.convert";
+    protected $apiMethodName = "taobao.tbk.item.convert";
 
 
     public function setAdzoneId($adzoneId) {
@@ -39,6 +39,15 @@ class TbkShopConvertRequest extends PRequest {
 
     public function getAdzoneId() {
         return $this->adzoneId;
+    }
+
+    public function setNumIids($numIids) {
+        $this->numIids = $numIids;
+        $this->apiParas["num_iids"] = $numIids;
+    }
+
+    public function getNumIids() {
+        return $this->numIids;
     }
 
     public function setPlatform($platform) {
@@ -58,13 +67,5 @@ class TbkShopConvertRequest extends PRequest {
     public function getUnid() {
         return $this->unid;
     }
-
-    public function setUserIds($userIds) {
-        $this->userIds = $userIds;
-        $this->apiParas["user_ids"] = $userIds;
-    }
-
-    public function getUserIds() {
-        return $this->userIds;
-    }
 }
+
