@@ -14,6 +14,9 @@
     },
     "minimum-stability": "stable",
     "autoload": {
-        "psr-4": {"TAE\\": "src/TAE"}
+        "psr-4": {
+            "TAE\\": "src/TAE",
+            "TBK\\": "src/TBK"
+        }
     }
 }
